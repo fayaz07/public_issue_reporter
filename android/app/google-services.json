@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "14132541819",
+    "firebase_url": "https://public-issue-reporter.firebaseio.com",
+    "project_id": "public-issue-reporter",
+    "storage_bucket": "public-issue-reporter.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:14132541819:android:1525901af3c3e31af265de",
+        "android_client_info": {
+          "package_name": "com.fayaz07.public_issue_reporter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "14132541819-cdpr1ngcbvj78r27tqs6lrsq8l49n5o3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fayaz07.public_issue_reporter",
+            "certificate_hash": "c2e2ead11b2b3375f06c6614e9d8e3819f4b255f"
+          }
+        },
+        {
+          "client_id": "14132541819-btrpt9gqk9bq1rg34sl3a64bdum28boa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9su_P1Q3RcvlDzpiRr_NIn8fdV6I9EFo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "14132541819-btrpt9gqk9bq1rg34sl3a64bdum28boa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
