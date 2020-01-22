@@ -7,6 +7,7 @@ import 'package:public_issue_reporter/data_models/result.dart';
 import 'package:public_issue_reporter/providers/people/complete_profile.dart';
 import 'package:public_issue_reporter/providers/statistics_provider.dart';
 import 'package:public_issue_reporter/providers/people/people_data_provider.dart';
+import 'package:public_issue_reporter/screens/people/user_profile.dart';
 import 'package:public_issue_reporter/utils/configs.dart';
 
 class PeopleHome extends StatefulWidget {
@@ -23,18 +24,16 @@ class _PeopleHomeState extends State<PeopleHome> {
     People.fetchUserData().then((Result result) {
       print(result.message);
       if (result.success && result.hasData)
-        Provider
-            .of<PeopleProvider>(context, listen: false)
-            .user = result.data;
+        Provider.of<PeopleProvider>(context, listen: false).user = result.data;
       else
-        Navigator.of(context).push(
-            CupertinoPageRoute(builder: (BuildContext context) => CompleteProfile()));
+        Navigator.of(context).push(CupertinoPageRoute(
+            builder: (BuildContext context) => CompleteProfile()));
       _hideLoader();
     });
   }
 
   bool _isLoading = true;
-
+  
   @override
   Widget build(BuildContext context) {
     final peopleDataProvider = Provider.of<PeopleProvider>(context);
@@ -50,9 +49,13 @@ class _PeopleHomeState extends State<PeopleHome> {
           children: <Widget>[
             peopleDataProvider.user.uid != null
                 ? Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: getBody(peopleDataProvider, statisticsProvider),
-            )
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: [
+                      buildHomeScreen(peopleDataProvider, statisticsProvider),
+                      getNotificationScreen(),
+                      getProfile(),
+                    ].elementAt(_currentScreenIndex),
+                  )
                 : SizedBox(),
             _isLoading ? Configs.modalSheet : SizedBox(),
             _isLoading ? Configs.loader : SizedBox(),
@@ -65,8 +68,8 @@ class _PeopleHomeState extends State<PeopleHome> {
 
   var _formKey = GlobalKey<FormState>();
 
-  Widget getBody(PeopleProvider userProvider,
-      StatisticsProvider statisticsProvider) {
+  Widget buildHomeScreen(
+      PeopleProvider userProvider, StatisticsProvider statisticsProvider) {
     return SingleChildScrollView(
       child: Form(
         key: _formKey,
@@ -136,6 +139,14 @@ class _PeopleHomeState extends State<PeopleHome> {
     );
   }
 
+  Widget getProfile() => UserProfileScreen();
+
+  Widget getNotificationScreen() => Container(
+        child: Center(
+          child: Text("NOtification Screen"),
+        ),
+      );
+
   Widget _getOverallStatistics(StatisticsProvider statistics) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,7 +167,7 @@ class _PeopleHomeState extends State<PeopleHome> {
               child: _dashboardWidget(
                   title: 'Solved Issues',
                   content:
-                  statistics.overallStatistics.solved_issues.toString()),
+                      statistics.overallStatistics.solved_issues.toString()),
             ),
           ],
         ),
@@ -167,14 +178,14 @@ class _PeopleHomeState extends State<PeopleHome> {
               child: _dashboardWidget(
                   title: 'Pending Issues',
                   content:
-                  statistics.overallStatistics.pending_issues.toString()),
+                      statistics.overallStatistics.pending_issues.toString()),
             ),
             Expanded(
               flex: 5,
               child: _dashboardWidget(
                 title: 'Rejected Issues',
                 content:
-                statistics.overallStatistics.rejected_issues.toString(),
+                    statistics.overallStatistics.rejected_issues.toString(),
               ),
             ),
           ],
@@ -250,21 +261,19 @@ class _PeopleHomeState extends State<PeopleHome> {
     );
   }
 
-
-  _showLoader(){
+  _showLoader() {
     setState(() {
       _isLoading = true;
     });
   }
 
-  _hideLoader(){
+  _hideLoader() {
     setState(() {
       _isLoading = false;
     });
   }
 
-  Widget _bottomNavbar() =>
-      BottomNavigationBar(
+  Widget _bottomNavbar() => BottomNavigationBar(
         selectedItemColor: Colors.blue,
         onTap: (int t) {
           setState(() {
