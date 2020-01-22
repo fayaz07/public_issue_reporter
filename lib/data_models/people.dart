@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:public_issue_reporter/backend/initialize.dart';
 import 'package:public_issue_reporter/data_models/result.dart';
-import 'package:public_issue_reporter/providers/people/people_data_provider.dart';
+// import 'package:public_issue_reporter/providers/people/people_data_provider.dart';
 
 class People with ChangeNotifier {
   String uid;
