@@ -1,4 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:public_issue_reporter/backend/initialize.dart';
+import 'package:public_issue_reporter/data_models/result.dart';
+import 'package:random_string/random_string.dart';
 
 class Issue {
   String id;
@@ -7,6 +10,9 @@ class Issue {
   String description;
   List<dynamic> images;
   String old_references;
+
+  List<dynamic> supporters;
+  List<dynamic> opposers;
 
   double latitude;
   double longitude;
@@ -50,7 +56,9 @@ class Issue {
       this.authority_change_requested,
       this.timeline,
       this.additional_data,
-      this.priority});
+      this.priority,
+      this.opposers,
+      this.supporters});
 
   factory Issue.fromJSON(var map) {
     return Issue(
@@ -76,6 +84,8 @@ class Issue {
       timeline: map['timeline'],
       additional_data: map['additional_data'],
       priority: getPriorityFromString(map['priority'].toString()),
+      supporters: map['supporters'],
+      opposers: map['opposers'],
     );
   }
 
@@ -140,7 +150,27 @@ class Issue {
       'timeline': issue.timeline,
       'additional_data': issue.additional_data,
       'priority': issue.priority.toString().substring(8),
+      'supporters': issue.supporters,
+      'opposers': issue.opposers,
     };
+  }
+
+  /// Database operations
+  ///
+
+  static Future<Result> createIssue(Issue issue) async {
+    Result result = Result();
+
+    var id = randomAlphaNumeric(7);
+    await FireBase.issuesCollection
+        .document(id)
+        .setData(toJSON(issue))
+        .whenComplete(() {
+      print('success');
+    }).catchError((error) {
+      print(error);
+    });
+    return Result(success: true);
   }
 }
 
