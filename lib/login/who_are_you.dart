@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:public_issue_reporter/login/user_login.dart';
+import 'package:public_issue_reporter/login/admin_login.dart';
+import 'package:public_issue_reporter/login/phone_auth/get_phone.dart';
 
 class WhoAreYou extends StatefulWidget {
   @override
@@ -17,11 +18,14 @@ class _WhoAreYouState extends State<WhoAreYou> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            getIconButton('Admin', 'assets/admin.png', () {}),
+            getIconButton('Admin', 'assets/admin.png', () {
+              Navigator.of(context).pushReplacement(CupertinoPageRoute(
+                  builder: (BuildContext context) => AdminLogin()));
+            }),
             SizedBox(height: 16.0),
             getIconButton('People', 'assets/people.png', () {
               Navigator.of(context).pushReplacement(CupertinoPageRoute(
-                  builder: (BuildContext context) => UserLogin()));
+                  builder: (BuildContext context) => PhoneAuthGetPhone()));
             }),
           ],
         ),
