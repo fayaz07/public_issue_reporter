@@ -35,7 +35,7 @@ class _PeopleHomeState extends State<PeopleHome> {
   }
 
   bool _isLoading = true;
-  
+
   @override
   Widget build(BuildContext context) {
     final peopleDataProvider = Provider.of<PeopleProvider>(context);
@@ -53,10 +53,10 @@ class _PeopleHomeState extends State<PeopleHome> {
                 ? Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: [
-                buildHomeScreen(peopleDataProvider, statisticsProvider),
-            getNotificationScreen(),
-            getProfile(),
-          ].elementAt(_currentScreenIndex),
+                      buildHomeScreen(peopleDataProvider, statisticsProvider),
+                      getNotificationScreen(),
+                      getProfile(),
+                    ].elementAt(_currentScreenIndex),
                   )
                 : SizedBox(),
             _isLoading ? Configs.modalSheet : SizedBox(),

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:public_issue_reporter/data_models/issue.dart';
 import 'package:public_issue_reporter/data_models/result.dart';
 import 'package:public_issue_reporter/providers/issues_provider.dart';
+import 'package:public_issue_reporter/screens/people/viewIssueDetailed.dart';
 import 'package:public_issue_reporter/utils/configs.dart';
 import 'package:public_issue_reporter/utils/widgets.dart';
 
@@ -47,6 +48,9 @@ class _TrackIssuesState extends State<TrackIssues> {
     final issuesProvider = Provider.of<IssuesProvider>(context);
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Track your issues'),
+      ),
       body: Stack(
         children: <Widget>[
           _getBody(issuesProvider),
@@ -61,8 +65,14 @@ class _TrackIssuesState extends State<TrackIssues> {
     return issuesProvider.issues.length > 0
         ? ListView.builder(
             itemCount: issuesProvider.issues.length,
-            itemBuilder: (context, i) =>
-                MyWidgets.issueWidget(issuesProvider.issues[i]))
+            itemBuilder: (context, i) => InkWell(
+                onTap: () {
+                  Navigator.of(context).push(CupertinoPageRoute(
+                      builder: (BuildContext context) => ViewIssueDetailed(
+                            issue: issuesProvider.issues[i],
+                          )));
+                },
+                child: MyWidgets.issueWidget(issuesProvider.issues[i])))
         : _isLoading
             ? SizedBox()
             : Center(child: Text('Something has gone wrong'));
