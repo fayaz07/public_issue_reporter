@@ -9,6 +9,7 @@ import 'package:public_issue_reporter/providers/statistics_provider.dart';
 import 'package:public_issue_reporter/providers/people/people_data_provider.dart';
 import 'package:public_issue_reporter/screens/people/raise_issue.dart';
 import 'package:public_issue_reporter/screens/people/track_my_issues.dart';
+import 'package:public_issue_reporter/screens/people/user_profile.dart';
 import 'package:public_issue_reporter/utils/configs.dart';
 
 class PeopleHome extends StatefulWidget {
@@ -34,7 +35,7 @@ class _PeopleHomeState extends State<PeopleHome> {
   }
 
   bool _isLoading = true;
-
+  
   @override
   Widget build(BuildContext context) {
     final peopleDataProvider = Provider.of<PeopleProvider>(context);
@@ -51,7 +52,11 @@ class _PeopleHomeState extends State<PeopleHome> {
             peopleDataProvider.user.uid != null
                 ? Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: getBody(peopleDataProvider, statisticsProvider),
+                    child: [
+                buildHomeScreen(peopleDataProvider, statisticsProvider),
+            getNotificationScreen(),
+            getProfile(),
+          ].elementAt(_currentScreenIndex),
                   )
                 : SizedBox(),
             _isLoading ? Configs.modalSheet : SizedBox(),
@@ -65,7 +70,7 @@ class _PeopleHomeState extends State<PeopleHome> {
 
   var _formKey = GlobalKey<FormState>();
 
-  Widget getBody(
+  Widget buildHomeScreen(
       PeopleProvider userProvider, StatisticsProvider statisticsProvider) {
     return SingleChildScrollView(
       child: Form(
@@ -141,6 +146,14 @@ class _PeopleHomeState extends State<PeopleHome> {
       ),
     );
   }
+
+  Widget getProfile() => UserProfileScreen();
+
+  Widget getNotificationScreen() => Container(
+        child: Center(
+          child: Text("NOtification Screen"),
+        ),
+      );
 
   Widget _getOverallStatistics(StatisticsProvider statistics) {
     return Column(
