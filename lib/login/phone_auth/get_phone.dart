@@ -24,7 +24,7 @@ class PhoneAuthGetPhone extends StatefulWidget {
    */
   Color cardBackgroundColor = Colors.greenAccent;
   String logo = Assets.logo;
-  String appName = "Awesome app";
+  String appName = "Issue Reporter";
 
   @override
   _PhoneAuthGetPhoneState createState() => _PhoneAuthGetPhoneState();

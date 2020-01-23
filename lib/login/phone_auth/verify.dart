@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:public_issue_reporter/backend/initialize.dart';
 import 'package:public_issue_reporter/utils/constants.dart';
 import 'package:public_issue_reporter/utils/widgets.dart';
 import 'package:public_issue_reporter/screens/people/people_home.dart';
@@ -15,7 +16,7 @@ class PhoneAuthVerify extends StatefulWidget {
    */
   Color cardBackgroundColor = Colors.greenAccent;
   String logo = Assets.logo;
-  String appName = "Awesome app";
+  String appName = "Issue Reporter";
 
   @override
   _PhoneAuthVerifyState createState() => _PhoneAuthVerifyState();
@@ -42,10 +43,12 @@ class _PhoneAuthVerifyState extends State<PhoneAuthVerify> {
 //      //if (FirebasePhoneAuth.phoneAuthState.isClosed)
 //
 //    });
-    FirebasePhoneAuth.phoneAuthState.stream.listen((PhoneAuthState state) {
+    FirebasePhoneAuth.phoneAuthState.stream
+        .listen((PhoneAuthState state) async {
       if (state == PhoneAuthState.Verified) {
-        Navigator.of(context).pushReplacement(
-            CupertinoPageRoute(builder: (BuildContext context) => PeopleHome()));
+        FireBase.currentUser = await FirebaseAuth.instance.currentUser();
+        Navigator.of(context).pushReplacement(CupertinoPageRoute(
+            builder: (BuildContext context) => PeopleHome()));
       }
       print(state);
     });

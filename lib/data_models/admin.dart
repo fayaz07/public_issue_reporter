@@ -209,6 +209,7 @@ class Admin {
       result = Result(
           success: true, message: 'Updated data successfully', hasData: false);
     }).catchError((error) {
+      print(error);
       result = Result(
         success: false,
         message: error.message,

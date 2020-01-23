@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:public_issue_reporter/backend/initialize.dart';
+import 'package:public_issue_reporter/data_models/locality.dart';
 import 'package:public_issue_reporter/data_models/people.dart';
 import 'package:public_issue_reporter/data_models/result.dart';
+import 'package:public_issue_reporter/providers/admin/localities_provider.dart';
 import 'package:public_issue_reporter/providers/people/people_data_provider.dart';
 import 'package:public_issue_reporter/utils/configs.dart';
+import 'package:public_issue_reporter/utils/custom_drop_down_button.dart';
 import 'package:public_issue_reporter/utils/widgets.dart';
 
 class CompleteProfile extends StatefulWidget {
@@ -19,7 +22,21 @@ class _CompleteProfileState extends State<CompleteProfile> {
   var _formKey = GlobalKey<FormState>();
 
   @override
+  void initState() {
+    Locality.getLocalities().then((Result result) {
+      if (result.success)
+        Provider.of<LocalitiesProvider>(context, listen: false).localities =
+            result.data;
+    }).catchError((error) {
+      print(error);
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final localitiesProvider = Provider.of<LocalitiesProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Complete Profile'),
@@ -54,6 +71,24 @@ class _CompleteProfileState extends State<CompleteProfile> {
                   validator: (value) => Configs.validateText(
                       field: 'Address', value: value, length: 10),
                 ),
+                localitiesProvider.localities.length > 0
+                    ? DropDownButton(
+                        items: List.generate(
+                            localitiesProvider.localities.length, (int i) {
+                          return localitiesProvider.localities[i].name
+                              .toString();
+                        }),
+                        title: 'Select your locality',
+                        onSelected: (value) {
+                          localitiesProvider.localities.forEach((Locality l) {
+                            if (l.name.contains(value)) {
+                              people.locality_id = l.locality_id;
+                              return;
+                            }
+                          });
+                        },
+                      )
+                    : SizedBox(height: 50.0, child: Configs.loader),
                 SizedBox(height: 32.00),
                 MyWidgets.platformButton(
                     text: 'Submit',
@@ -66,7 +101,8 @@ class _CompleteProfileState extends State<CompleteProfile> {
                         People.updateUserData(people: people)
                             .then((Result result) {
                           if (result.success)
-                            Provider.of<PeopleProvider>(context, listen: false).user = people;
+                            Provider.of<PeopleProvider>(context, listen: false)
+                                .user = people;
                           Navigator.of(context).pop();
                         });
                       }

@@ -51,22 +51,24 @@ class _AdminLoginState extends State<AdminLogin> {
   login() {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
-      print(email);
-      print(password);
+      _showLoader();
 
       FireBase.auth
           .signInWithEmailAndPassword(email: email, password: password)
-          .then((AuthResult result) {
+          .then((AuthResult result) async {
         if (result.user != null) {
 //          print("login success");
+          FireBase.currentUser = await FirebaseAuth.instance.currentUser();
           Navigator.of(context).pushReplacement(CupertinoPageRoute(
               builder: (BuildContext context) => AdminHome()));
-        }else{
+        } else {
           print('failed');
         }
       }).catchError((error) {
         print(error);
       });
+
+      _hideLoader();
     }
   }
 

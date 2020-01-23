@@ -8,7 +8,7 @@ class Issue {
 
   String title;
   String description;
-  List<dynamic> images;
+  String images;
   String old_references;
 
   List<dynamic> supporters;
@@ -60,6 +60,30 @@ class Issue {
       this.opposers,
       this.supporters});
 
+  static List<Comment> getListOfComments(var map) {
+    List<Comment> comments = [];
+
+    for (var c in map) {
+      comments.add(Comment.fromJSON(c));
+    }
+    return comments;
+  }
+
+  static List<Timeline> getTimelinesFromMap(var map) {
+    List<Timeline> timeline = [];
+
+    for (var c in map) {
+      timeline.add(Timeline.fromJSON(c));
+    }
+
+    return timeline;
+  }
+
+  static DateTime DateTimeFromTimestamp(var timestamp) {
+    return DateTime.fromMicrosecondsSinceEpoch(
+        timestamp.millisecondsSinceEpoch * 1000);
+  }
+
   factory Issue.fromJSON(var map) {
     return Issue(
       id: map['id'],
@@ -74,14 +98,14 @@ class Issue {
       author_id: map['author_id'],
       locality_id: map['locality_id'],
       assignee_id: map['assignee_id'],
-      comments: map['comments'],
-      created_on: map['created_on'],
-      last_updated: map['last_updated'],
+      comments: getListOfComments(map['comments']),
+      created_on: DateTimeFromTimestamp(map['created_on']),
+      last_updated: DateTimeFromTimestamp(map['last_updated']),
       status: getStatusFromString(map['status'].toString()),
       authority_status:
           getAuthorityStatusFromString(map['authority_status'].toString()),
       authority_change_requested: map['authority_change_requested'],
-      timeline: map['timeline'],
+      timeline: getTimelinesFromMap(map['timeline']),
       additional_data: map['additional_data'],
       priority: getPriorityFromString(map['priority'].toString()),
       supporters: map['supporters'],
@@ -144,12 +168,12 @@ class Issue {
       'comments': issue.comments,
       'created_on': issue.created_on,
       'last_updated': issue.last_updated,
-      'status': issue.status.toString().substring(6),
-      'authority_status': issue.authority_status.toString().substring(15),
+      'status': issue.status.toString().substring(7),
+      'authority_status': issue.authority_status.toString().substring(16),
       'authority_change_requested': issue.authority_change_requested,
       'timeline': issue.timeline,
       'additional_data': issue.additional_data,
-      'priority': issue.priority.toString().substring(8),
+      'priority': issue.priority.toString().substring(9),
       'supporters': issue.supporters,
       'opposers': issue.opposers,
     };
@@ -162,16 +186,52 @@ class Issue {
     Result result = Result();
 
     var id = randomAlphaNumeric(7);
+
+    issue.id = id;
+
     await FireBase.issuesCollection
         .document(id)
         .setData(toJSON(issue))
         .whenComplete(() {
-      print('success');
+      result = Result(
+          success: true, hasData: false, message: 'Successfully posted issue');
     }).catchError((error) {
       print(error);
+      result = Result(
+          success: false,
+          hasData: false,
+          message: 'Failed to post issue ${error.toString()}');
     });
-    return Result(success: true);
+    return result;
   }
+
+  static Future<Result> fetchIssuesWithLimitForCurrentUser() async {
+    Result result = Result();
+    await FireBase.issuesCollection
+        .where('author_id', isEqualTo: FireBase.currentUser.uid)
+        .getDocuments(source: Source.serverAndCache)
+        .then((QuerySnapshot snapshot) {
+      List<Issue> issues = [];
+      for (var c in snapshot.documents) {
+        issues.add(Issue.fromJSON(c.data));
+      }
+
+      result = Result(
+          success: true,
+          hasData: true,
+          message: 'Fetched issues',
+          data: issues);
+    }).catchError((error) {
+      result =
+          Result(success: false, hasData: false, message: error.toString());
+    });
+    return result;
+  }
+
+  static Future<Result> fetchIssuesWithStatusAndLocalityId(){
+
+  }
+
 }
 
 enum Priority { Low, Medium, High }
@@ -220,7 +280,7 @@ class Timeline {
     return Timeline(
       update_description: map['update_description'],
       updated_by: map['updated_by'],
-      updated_on: map['updated_on'],
+      updated_on: Issue.DateTimeFromTimestamp(map['updated_on']),
     );
   }
 

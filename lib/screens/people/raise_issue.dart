@@ -1,8 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
+import 'package:provider/provider.dart';
+import 'package:public_issue_reporter/backend/initialize.dart';
 import 'package:public_issue_reporter/data_models/issue.dart';
+import 'package:public_issue_reporter/data_models/result.dart';
+import 'package:public_issue_reporter/providers/people/people_data_provider.dart';
 import 'package:public_issue_reporter/utils/configs.dart';
 import 'package:public_issue_reporter/utils/widgets.dart';
 
@@ -19,13 +26,94 @@ class RaiseIssue extends StatefulWidget {
 class _RaiseIssueState extends State<RaiseIssue> {
   Issue issue = Issue();
 
+  File image;
+
+  bool _isLoading = false;
+
+  _showLoader() {
+    setState(() {
+      _isLoading = true;
+    });
+  }
+
+  _hideLoader() {
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  createIssue() async {
+    if (_formKey.currentState.validate()) {
+      _formKey.currentState.save();
+      if (image != null && issue.latitude != null) {
+        _showLoader();
+        issue.priority = Priority.High;
+        issue.status = Status.Pending;
+        issue.authority_status = AuthorityStatus.WardMember;
+        issue.supporters = [];
+        issue.opposers = [];
+        issue.timeline = [];
+        issue.authority_change_requested = false;
+        issue.last_updated = DateTime.now();
+        issue.created_on = DateTime.now();
+        issue.comments = [];
+        issue.author_id = FireBase.currentUser.uid;
+        issue.locality_id = Provider.of<PeopleProvider>(context, listen: false)
+            .user
+            .locality_id;
+
+        await FireBase.uploadImageAndReturnURL(
+                image: image, ref: FireBase.issuesDocuments)
+            .then((value) {
+          issue.images = value;
+        });
+
+        await Issue.createIssue(issue).then((Result result) {
+          print(result);
+        }).catchError((error) {
+          print(error);
+        });
+      } else {
+        MyWidgets.alertDialog(
+            content: Text('Please fill the required details'),
+            context: context,
+            title: Text('Details required'),
+            actions: [
+              FlatButton(
+                child: Text('Ok'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ]);
+      }
+
+      _hideLoader();
+    }
+  }
+
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: SingleChildScrollView(
+      body: Stack(
+        children: <Widget>[
+          _getBody(),
+          _isLoading ? Configs.modalSheet : SizedBox(),
+          _isLoading ? Configs.loader : SizedBox(),
+        ],
+      ),
+    );
+  }
+
+  Widget _getBody() {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -68,7 +156,21 @@ class _RaiseIssueState extends State<RaiseIssue> {
                   validator: (value) => null,
                 ),
                 pickLocationWidget(),
-
+                MyWidgets.pickImageAndPresent(
+                  onPressed: () async {
+                    image = await ImagePicker.pickImage(
+                        source: ImageSource.gallery);
+                    if (image != null) {
+                      setState(() {});
+                    }
+                  },
+                  image: image,
+                ),
+                SizedBox(height: 32.0),
+                MyWidgets.platformButton(
+                  text: 'Submit',
+                  onPressed: createIssue,
+                )
               ],
             ),
           ),
@@ -146,6 +248,7 @@ class _RaiseIssueState extends State<RaiseIssue> {
   }
 
   void selectCurrentLocation() async {
+    _showLoader();
     if (hasLocationPermission) {
       currLocation = await location.getLocation();
       print(currLocation.latitude);
@@ -167,5 +270,6 @@ class _RaiseIssueState extends State<RaiseIssue> {
         }
       });
     }
+    _hideLoader();
   }
 }

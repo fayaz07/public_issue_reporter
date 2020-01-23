@@ -105,8 +105,8 @@ class _AdminHomeState extends State<AdminHome> {
                     borderRadius: BorderRadius.circular(8.0)),
                 color: Colors.redAccent,
                 onPressed: () {
-                  Navigator.of(context).push(CupertinoPageRoute(
-                      builder: (BuildContext context) => ViewIssues()));
+//                  Navigator.of(context).push(CupertinoPageRoute(
+//                      builder: (BuildContext context) => ViewIssues()));
                 },
                 child: SizedBox(
                   height: 80.0,

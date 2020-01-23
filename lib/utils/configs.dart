@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:intl/intl.dart';
 
 class Configs {
   static final primaryColor = Colors.blueAccent;
@@ -41,16 +42,21 @@ class Configs {
     return null;
   }
 
+  static final formatter = new DateFormat('dd/MM/yyyy h:mm:ss a');
+
+  static String getDateTime(DateTime dateTime) {
+    return formatter.format(dateTime);
+  }
 
   /// getSearchableTagList & getSubSets
   /// these methods will be used for searching the item
   /// getSubSets will take a string as input and will return subsets of that string with minimum characters of 3
-  static List<String> getSearchableTagList(List<String> tags){
+  static List<String> getSearchableTagList(List<String> tags) {
     // TODO: Implement
     return tags;
   }
 
-  static List<String> getSubSets(String key){
+  static List<String> getSubSets(String key) {
     //  TODO: implement
   }
 }

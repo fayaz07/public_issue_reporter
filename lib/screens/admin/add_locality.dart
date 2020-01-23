@@ -23,7 +23,7 @@ class _AddLocalityState extends State<AddLocality> {
     Admin.getUnAllocatedAdmins().then((Result result) {
       if (result.success) {
         admins = result.data;
-        if(admins.length==0) {
+        if (admins.length == 0) {
           //  TODO: show dialog
           print('no admins');
         }
@@ -82,19 +82,20 @@ class _AddLocalityState extends State<AddLocality> {
                   label: 'Name of locality',
                   hint: 'Ex: Narsapur',
                   save: (value) => locality.name = value,
-                  validator: (value) => Configs.validateText(
-                      field: 'Name', value: value, length: 3),
+                  validator: (value) =>
+                      Configs.validateText(
+                          field: 'Name', value: value, length: 3),
                 ),
                 DropDownButton(
                     title: 'Select admin to be assigned',
                     items: List.generate(
                         admins.length,
-                        (int i) =>
-                            admins[i].name + ' (' + admins[i].email + ')'),
+                            (int i) =>
+                        admins[i].name + ' (' + admins[i].email + ')'),
                     onSelected: (value) {
 //                    locality.admin_id =
                       admins.forEach((Admin a) {
-                        if (value.toString().contains(a.name)) {
+                        if (value.toString().contains(a.email)) {
                           locality.admin_id = a.uid;
                           print(locality.admin_id);
                           return;

@@ -2,10 +2,13 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_crop/image_crop.dart';
+import 'package:intl/intl.dart';
 import 'package:public_issue_reporter/data_models/issue.dart';
 import 'package:rxdart/rxdart.dart';
 import '../data_models/countries.dart';
 import 'package:flutter/cupertino.dart';
+
+import 'configs.dart';
 
 class PhoneAuthWidgets {
   static Widget getLogo({String logoPath, double height}) => Material(
@@ -46,7 +49,8 @@ class PhoneAuthWidgets {
         ),
       );
 
-  static Widget selectableWidget(Country country, Function(Country) selectThisCountry) =>
+  static Widget selectableWidget(
+          Country country, Function(Country) selectThisCountry) =>
       Material(
         color: Colors.white,
         type: MaterialType.canvas,
@@ -93,37 +97,29 @@ class PhoneAuthWidgets {
       alignment: Alignment.centerLeft,
       child: Text(' $text',
           style: TextStyle(color: Colors.white, fontSize: 14.0)));
-
 }
 
 class MyWidgets {
-
-  static Widget issueWidget(Issue issue){
-    return Card(
-
-    );
-  }
-
   static void alertDialog(
       {BuildContext context,
-        List<Widget> actions,
-        Widget title,
-        Widget content}) {
+      List<Widget> actions,
+      Widget title,
+      Widget content}) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => Platform.isAndroid
           ? AlertDialog(
-        actions: actions,
-        content: content,
-        title: title,
-        elevation: 8.0,
-      )
+              actions: actions,
+              content: content,
+              title: title,
+              elevation: 8.0,
+            )
           : CupertinoAlertDialog(
-        actions: actions,
-        content: content,
-        title: title,
-      ),
+              actions: actions,
+              content: content,
+              title: title,
+            ),
     );
   }
 
@@ -153,12 +149,7 @@ class MyWidgets {
     );
   }
 
-  static Widget pickImageAndPresent(
-      {File image,
-        Function onPressed,
-        bool isCropped,
-        var cropKey,
-        Function crop}) {
+  static Widget pickImageAndPresent({File image, Function onPressed}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
@@ -171,58 +162,34 @@ class MyWidgets {
           //  Pick image if image == null
           image == null
               ? CupertinoButton(
-            color: Colors.indigo,
-            borderRadius: BorderRadius.circular(4.0),
-            onPressed: onPressed,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Icon(
-                  Icons.file_upload,
-                  color: Colors.white,
-                  size: 18.0,
-                ),
-                SizedBox(width: 8.0),
-                Text('Please upload an image',
-                    style: TextStyle(color: Colors.white, fontSize: 16.0))
-              ],
-            ),
-          )
+                  color: Colors.indigo,
+                  borderRadius: BorderRadius.circular(4.0),
+                  onPressed: onPressed,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(
+                        Icons.file_upload,
+                        color: Colors.white,
+                        size: 18.0,
+                      ),
+                      SizedBox(width: 8.0),
+                      Text('Please upload an image',
+                          style: TextStyle(color: Colors.white, fontSize: 16.0))
+                    ],
+                  ),
+                )
               : SizedBox(),
 
-          (!isCropped && image != null)
-              ? SafeArea(
-            child: Container(
-              constraints: BoxConstraints(maxHeight: 600.0),
-              color: Colors.white,
-              padding: const EdgeInsets.all(16.0),
-              child: Crop.file(
-                image,
-                maximumScale: 1.0,
-                key: cropKey,
-                aspectRatio: 4.0 / 3.0,
-              ),
-            ),
-          )
-              : SizedBox(),
-
-          (isCropped && image != null)
+          image != null
               ? Image.file(
-            image,
-            fit: BoxFit.fill,
-//                      height: 250.0,
-            repeat: ImageRepeat.noRepeat,
-          )
+                  image,
+                  fit: BoxFit.fill,
+                  height: 250.0,
+                  repeat: ImageRepeat.noRepeat,
+                )
               : SizedBox(),
-
-          (!isCropped && image != null)
-              ? FlatButton(
-              onPressed: crop,
-              child: SizedBox(
-                  width: double.infinity,
-                  child: Center(child: Text('CROP'))))
-              : SizedBox()
         ],
       ),
     );
@@ -230,11 +197,13 @@ class MyWidgets {
 
   static Widget textField(
       {String hint,
-        String label,
-        Function(String) validator,
-        Function(String) save,
-        bool isObscure,
-        int maxLines, String initialValue, bool enabled}) {
+      String label,
+      Function(String) validator,
+      Function(String) save,
+      bool isObscure,
+      int maxLines,
+      String initialValue,
+      bool enabled}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
@@ -242,7 +211,7 @@ class MyWidgets {
         enabled: enabled ?? true,
         validator: validator,
         toolbarOptions:
-        ToolbarOptions(copy: true, cut: true, paste: true, selectAll: true),
+            ToolbarOptions(copy: true, cut: true, paste: true, selectAll: true),
         obscureText: isObscure ?? false,
         onSaved: save,
         maxLines: maxLines ?? 1,
@@ -250,8 +219,7 @@ class MyWidgets {
             border: OutlineInputBorder(),
             hintText: hint ?? ' ',
             labelText: label ?? ' ',
-          alignLabelWithHint: true
-        ),
+            alignLabelWithHint: true),
       ),
     );
   }
@@ -271,11 +239,11 @@ class MyWidgets {
 
   static Widget textFieldWithTitleAndCardBackground(
       {String hint,
-        String label,
-        Function(String) validator,
-        Function(String) save,
-        bool isObscure,
-        int maxLines}) {
+      String label,
+      Function(String) validator,
+      Function(String) save,
+      bool isObscure,
+      int maxLines}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
@@ -299,7 +267,7 @@ class MyWidgets {
                 onSaved: save,
                 maxLines: maxLines ?? 1,
                 decoration:
-                InputDecoration(border: InputBorder.none, hintText: hint),
+                    InputDecoration(border: InputBorder.none, hintText: hint),
 //              decoration: InputDecoration(
 //                  //border: OutlineInputBorder(),
 //                  hintText: hint ?? ' ',
@@ -413,6 +381,41 @@ class MyWidgets {
       preferredSize: Size(double.infinity, 50.0),
     );
   }
+
+  static Widget issueWidget(Issue issue) {
+    return Card(
+      margin: const EdgeInsets.all(8.0),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              '${issue.title}',
+              style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.w700),
+            ),
+            SizedBox(height: 4.0),
+            Row(
+              children: <Widget>[
+                Expanded(child: Text('${issue.description.substring(0, 50)}')),
+              ],
+            ),
+            SizedBox(height: 4.0),
+            Text('Status: ${issue.status.toString().substring(7)}'),
+            SizedBox(height: 4.0),
+            Text(
+                'Authority status: ${issue.authority_status.toString().substring(16)}'),
+            SizedBox(height: 4.0),
+            Text('Last updated: ${Configs.getDateTime(issue.last_updated)}'),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 /// Copyright
@@ -427,9 +430,9 @@ class TagsField extends StatefulWidget {
 
   TagsField(
       {@required this.onTagAdded,
-        @required this.onTagRemoved,
-        this.label = "Add your tags",
-        this.tags = true});
+      @required this.onTagRemoved,
+      this.label = "Add your tags",
+      this.tags = true});
 
   @override
   _TagsFieldState createState() => _TagsFieldState();
@@ -640,6 +643,4 @@ class _SingleSelectionButtonState extends State<SingleSelectionButton> {
       ),
     );
   }
-
-
 }
