@@ -21,10 +21,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   Widget _buildProfile() {
-    final user = Provider.of<PeopleProvider>(context, listen: false).user;
+    final user = Provider.of<PeopleProvider>(context).user;
     Map<String, dynamic> _buildElements = People.toJSON(user);
     _buildElements.forEach((f, h) {
-      print("$f" + ":" + "$h");
+      // print("$f" + ":" + "$h");
     });
     return SingleChildScrollView(
       child: Center(
@@ -111,7 +111,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       builder: (BuildContext context, AsyncSnapshot<Result> snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.none:
-
           case ConnectionState.waiting:
           case ConnectionState.active:
             return Center(

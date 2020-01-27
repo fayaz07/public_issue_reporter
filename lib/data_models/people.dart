@@ -40,6 +40,7 @@ class People with ChangeNotifier {
       this.rejected_issues = 0,
       // ignore: non_constant_identifier_names
       this.pending_issues,
+      // ignore: non_constant_identifier_names
       this.locality_id,
       this.address}) {
     this.pending_issues =

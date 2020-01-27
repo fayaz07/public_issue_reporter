@@ -21,7 +21,6 @@ class FireBase {
     } else {
       /// People loggedin
       if (currentUser.email == null) return {'logged_in': true, 'user_type': 1};
-
       /// Admin loggedin
       return {'logged_in': true, 'user_type': 2};
     }
