@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-import 'package:public_issue_reporter/backend/initialize.dart';
+import 'package:public_issue_reporter/firebase/initialize.dart';
 import 'package:public_issue_reporter/data_models/admin.dart';
 import 'package:public_issue_reporter/data_models/result.dart';
 import 'package:public_issue_reporter/providers/admin/admin_provider.dart';
 import 'package:public_issue_reporter/utils/configs.dart';
+import 'package:public_issue_reporter/utils/session_data.dart';
 import 'package:public_issue_reporter/utils/widgets.dart';
 
 class CompleteProfile extends StatefulWidget {
@@ -55,6 +56,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
         if (result.success) {
           Provider.of<AdminProvider>(context, listen: false).admin =
               result.data;
+          SessionData.adminData = result.data;
           Navigator.of(context).pop();
         }
       }).catchError((error) {

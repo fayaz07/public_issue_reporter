@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:public_issue_reporter/backend/initialize.dart';
+import 'package:public_issue_reporter/firebase/initialize.dart';
 import 'package:public_issue_reporter/data_models/admin.dart';
 import 'package:public_issue_reporter/data_models/locality.dart';
 import 'package:public_issue_reporter/data_models/result.dart';
@@ -86,7 +86,8 @@ class _AddLocalityState extends State<AddLocality> {
                       Configs.validateText(
                           field: 'Name', value: value, length: 3),
                 ),
-                DropDownButton(
+                admins.length > 0
+                    ? DropDownButton(
                     title: 'Select admin to be assigned',
                     items: List.generate(
                         admins.length,
@@ -101,7 +102,10 @@ class _AddLocalityState extends State<AddLocality> {
                           return;
                         }
                       });
-                    }),
+                    })
+                    : SizedBox(
+                  child: Text('No admins'),
+                ),
                 SizedBox(height: 32.0),
                 MyWidgets.platformButton(
                   text: 'Save',

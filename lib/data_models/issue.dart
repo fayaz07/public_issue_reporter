@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:public_issue_reporter/backend/initialize.dart';
+import 'package:public_issue_reporter/firebase/initialize.dart';
 import 'package:public_issue_reporter/data_models/result.dart';
 import 'package:random_string/random_string.dart';
 
@@ -141,8 +141,8 @@ class Issue {
     switch (s) {
       case "Accepted":
         return Status.Accepted;
-      case "Closed":
-        return Status.Closed;
+      case "Solved":
+        return Status.Solved;
       case "Pending":
         return Status.Pending;
       case "Rejected":
@@ -228,17 +228,272 @@ class Issue {
     return result;
   }
 
-  static Future<Result> fetchIssuesWithStatusAndLocalityId(){
+  static Future<Result> fetchAllIssues() async {
+    Result result = Result();
+    await FireBase.issuesCollection
+        .getDocuments(source: Source.serverAndCache)
+        .then((QuerySnapshot snapshot) {
+      List<Issue> issues = [];
+      for (var c in snapshot.documents) {
+        issues.add(Issue.fromJSON(c.data));
+      }
 
+      result = Result(
+          success: true,
+          hasData: true,
+          message: 'Fetched issues',
+          data: issues);
+    }).catchError((error) {
+      result =
+          Result(success: false, hasData: false, message: error.toString());
+    });
+    return result;
   }
 
+  static Future<Result> fetchIssuesWithStatusAndLocalityId(
+      {String locality_id, Status status}) async {
+    Result result = Result();
+    await FireBase.issuesCollection
+        .where('locality_id', isEqualTo: locality_id)
+        .where('status', isEqualTo: status.toString().substring(7))
+        .getDocuments(source: Source.serverAndCache)
+        .then((QuerySnapshot snapshot) {
+      List<Issue> issues = [];
+      for (var c in snapshot.documents) {
+        issues.add(Issue.fromJSON(c.data));
+      }
+
+      result = Result(
+          success: true,
+          hasData: true,
+          message: 'Fetched issues',
+          data: issues);
+    }).catchError((error) {
+      result =
+          Result(success: false, hasData: false, message: error.toString());
+    });
+    return result;
+  }
+
+  static Future<Result> addCommentToIssueWithId(
+      String issueId, Comment comment) async {
+    Result result = Result();
+
+    await FireBase.issuesCollection
+        .document(issueId)
+        .get()
+        .then((DocumentSnapshot snapshot) async {
+      Issue issue = Issue.fromJSON(snapshot.data);
+
+      List list = [];
+      list.addAll(issue.comments);
+      list.add(comment);
+
+      await FireBase.issuesCollection
+          .document(issueId)
+          .setData({"comments": list}, merge: true);
+
+      print('comment added');
+
+      result = Result(
+          success: true,
+          hasData: false,
+          message: 'Successfully posted comment');
+    }).catchError((error) {
+      print(error);
+      result = Result(
+          success: false,
+          hasData: false,
+          message: 'Failed to post comment ${error.toString()}');
+    });
+    return result;
+  }
+
+  static Future<Result> addTimelineToIssueWithId(
+      String issueId, Timeline timeline) async {
+    Result result = Result();
+
+    await FireBase.issuesCollection
+        .document(issueId)
+        .get()
+        .then((DocumentSnapshot snapshot) async {
+      Issue issue = Issue.fromJSON(snapshot.data);
+
+      List list = [];
+      list.addAll(issue.timeline);
+      list.add(timeline);
+
+      await FireBase.issuesCollection
+          .document(issueId)
+          .setData({"timeline": list}, merge: true);
+
+      result = Result(
+          success: true,
+          hasData: false,
+          message: 'Successfully added timeline');
+    }).catchError((error) {
+      print(error);
+      result = Result(
+          success: false,
+          hasData: false,
+          message: 'Failed to post issue ${error.toString()}');
+    });
+    return result;
+  }
+
+  static Future<Result> addSupportForIssue(
+      String issueId, String author_id) async {
+    Result result = Result();
+
+    await FireBase.issuesCollection
+        .document(issueId)
+        .get()
+        .then((DocumentSnapshot snapshot) async {
+      Issue issue = Issue.fromJSON(snapshot.data);
+
+      List list = [];
+      list.addAll(issue.supporters);
+
+      if (!list.contains(author_id)) {
+        list.add(author_id);
+        await FireBase.issuesCollection
+            .document(issueId)
+            .setData({"supporters": list}, merge: true);
+      }
+
+      result = Result(
+          success: true,
+          hasData: false,
+          message: 'Successfully added supporter');
+    }).catchError((error) {
+      print(error);
+      result = Result(
+          success: false,
+          hasData: false,
+          message: 'Failed to post issue ${error.toString()}');
+    });
+    return result;
+  }
+
+  static Future<Result> addOpposerForIssue(
+      String issueId, String author_id) async {
+    Result result = Result();
+
+    await FireBase.issuesCollection
+        .document(issueId)
+        .get()
+        .then((DocumentSnapshot snapshot) async {
+      Issue issue = Issue.fromJSON(snapshot.data);
+      List list = [];
+      list.addAll(issue.opposers);
+
+      if (!list.contains(author_id)) {
+        list.add(author_id);
+        await FireBase.issuesCollection
+            .document(issueId)
+            .setData({"opposers": list}, merge: true);
+      }
+
+      result = Result(
+          success: true, hasData: false, message: 'Successfully added opposer');
+    }).catchError((error) {
+      print(error);
+      result = Result(
+          success: false,
+          hasData: false,
+          message: 'Failed to post issue ${error.toString()}');
+    });
+    return result;
+  }
+
+  static Future<Result> changeAuthorityStatus(
+      String issueId, AuthorityStatus authorityStatus) async {
+    Result result = Result();
+
+    await FireBase.issuesCollection.document(issueId).setData(
+        {"authority_status": authorityStatus.toString().substring(16)},
+        merge: true).whenComplete(() {
+      result = Result(
+          success: true,
+          hasData: false,
+          message: 'Successfully changed authority status');
+    }).catchError((error) {
+      print(error);
+      result = Result(
+          success: false,
+          hasData: false,
+          message: 'Failed to post issue ${error.toString()}');
+    });
+    return result;
+  }
+
+  static Future<Result> assignIssueSelf(
+      String issueId, String author_id) async {
+    Result result = Result();
+
+    await FireBase.issuesCollection
+        .document(issueId)
+        .setData({"assignee_id": author_id}, merge: true).whenComplete(() {
+      result = Result(
+          success: true,
+          hasData: false,
+          message: 'Successfully changed authority status');
+    }).catchError((error) {
+      print(error);
+      result = Result(
+          success: false,
+          hasData: false,
+          message: 'Failed to post issue ${error.toString()}');
+    });
+    return result;
+  }
+
+  static Future<Result> changeIssueStatus(String issueId, Status status) async {
+    Result result = Result();
+
+    await FireBase.issuesCollection.document(issueId).setData(
+        {"status": status.toString().substring(7)},
+        merge: true).whenComplete(() {
+      result = Result(
+          success: true,
+          hasData: false,
+          message: 'Successfully changed authority status');
+    }).catchError((error) {
+      print(error);
+      result = Result(
+          success: false,
+          hasData: false,
+          message: 'Failed to post issue ${error.toString()}');
+    });
+    return result;
+  }
+
+  static Future<Result> requestAuthorityStatusChange(String issueId) async {
+    Result result = Result();
+
+    await FireBase.issuesCollection.document(issueId).setData(
+        {"authority_change_requested": true},
+        merge: true).whenComplete(() {
+      result = Result(
+          success: true,
+          hasData: false,
+          message: 'Successfully changed authority status');
+    }).catchError((error) {
+      print(error);
+      result = Result(
+          success: false,
+          hasData: false,
+          message: 'Failed to post issue ${error.toString()}');
+    });
+    return result;
+  }
 }
 
 enum Priority { Low, Medium, High }
 
 enum AuthorityStatus { WardMember, ViceSarpanch, Sarpanch }
 
-enum Status { Pending, Accepted, Rejected, Closed }
+enum Status { Pending, Accepted, Rejected, Solved }
 
 class Comment {
   String author_id;

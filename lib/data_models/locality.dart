@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:public_issue_reporter/backend/initialize.dart';
+import 'package:public_issue_reporter/firebase/initialize.dart';
 import 'package:public_issue_reporter/data_models/result.dart';
 import 'package:random_string/random_string.dart';
 
@@ -52,8 +52,7 @@ class Locality {
         .document(id)
         .setData(toJSON(locality))
         .whenComplete(() async {
-
-          ///
+      ///
       await Admin.setAdminLocality(
           admin_id: locality.admin_id, locality_id: locality.locality_id);
 
@@ -81,7 +80,7 @@ class Locality {
       if (snapshot.exists)
         result = Result(
             success: true,
-            hasData: false,
+            hasData: true,
             data: Locality.fromJSON(snapshot.data),
             message: 'Fetched locality successfully');
       else
@@ -106,7 +105,7 @@ class Locality {
       List<Locality> localities = [];
       for (var c in snapshot.documents) {
         Locality l = Locality.fromJSON(c.data);
-        await Admin.getAdminDataById(l.admin_id).then((Result result){
+        await Admin.getAdminDataById(l.admin_id).then((Result result) {
           l.additional_data = result.data;
         });
         localities.add(l);
@@ -123,6 +122,21 @@ class Locality {
           success: false,
           hasData: false,
           message: 'Adding locality failed ${error.message}');
+    });
+    return result;
+  }
+
+  static Future<Result> deleteLocality(String id) async {
+    Result result = Result();
+
+    await FireBase.localityCollection.document(id).delete().then((v) {
+      result = Result(success: true, message: 'Deleted locality successfully');
+    }).catchError((error) {
+      print(error);
+      result = Result(
+          success: false,
+          hasData: false,
+          message: 'Deleting locality failed ${error.message}');
     });
     return result;
   }

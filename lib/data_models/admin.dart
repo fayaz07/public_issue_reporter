@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:public_issue_reporter/backend/initialize.dart';
+import 'package:public_issue_reporter/firebase/initialize.dart';
 import 'package:public_issue_reporter/data_models/result.dart';
 
 class Admin {

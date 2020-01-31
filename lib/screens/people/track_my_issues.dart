@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:public_issue_reporter/data_models/issue.dart';
 import 'package:public_issue_reporter/data_models/result.dart';
 import 'package:public_issue_reporter/providers/issues_provider.dart';
-import 'package:public_issue_reporter/screens/people/viewIssueDetailed.dart';
+import 'package:public_issue_reporter/screens/people/view_issue_detailed.dart';
 import 'package:public_issue_reporter/utils/configs.dart';
 import 'package:public_issue_reporter/utils/widgets.dart';
 
@@ -75,6 +75,6 @@ class _TrackIssuesState extends State<TrackIssues> {
                 child: MyWidgets.issueWidget(issuesProvider.issues[i])))
         : _isLoading
             ? SizedBox()
-            : Center(child: Text('Something has gone wrong'));
+            : Center(child: Text('You didn\'t post any issues'));
   }
 }

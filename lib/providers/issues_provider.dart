@@ -10,4 +10,16 @@ class IssuesProvider with ChangeNotifier {
     _issues = i;
     notifyListeners();
   }
+
+  updateAnIssue(Issue issue){
+    issues.forEach((Issue e){
+      if(e.id == issue.id){
+        List<Issue> list = [];
+        list.addAll(issues);
+        list.add(issue);
+        list.remove(e);
+        issues = list;
+      }
+    });
+  }
 }

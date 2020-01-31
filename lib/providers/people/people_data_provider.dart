@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:public_issue_reporter/backend/initialize.dart';
+import 'package:public_issue_reporter/firebase/initialize.dart';
 import 'package:public_issue_reporter/data_models/people.dart';
 import 'package:flutter/foundation.dart';
 

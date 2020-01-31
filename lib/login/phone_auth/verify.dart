@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:public_issue_reporter/backend/initialize.dart';
+import 'package:public_issue_reporter/firebase/initialize.dart';
 import 'package:public_issue_reporter/utils/constants.dart';
 import 'package:public_issue_reporter/utils/widgets.dart';
 import 'package:public_issue_reporter/screens/people/people_home.dart';

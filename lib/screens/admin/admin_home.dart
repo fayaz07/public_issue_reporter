@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
+import 'package:public_issue_reporter/data_models/issue.dart';
+import 'package:public_issue_reporter/firebase/initialize.dart';
 import 'package:public_issue_reporter/data_models/admin.dart';
 import 'package:public_issue_reporter/data_models/result.dart';
+import 'package:public_issue_reporter/login/splash.dart';
 import 'package:public_issue_reporter/providers/admin/admin_provider.dart';
 import 'package:public_issue_reporter/screens/admin/add_locality.dart';
 import 'package:public_issue_reporter/screens/admin/complete_profile.dart';
 import 'package:public_issue_reporter/screens/admin/view_admins.dart';
 import 'package:public_issue_reporter/screens/admin/view_issues.dart';
 import 'package:public_issue_reporter/utils/configs.dart';
+import 'package:public_issue_reporter/utils/session_data.dart';
+import 'package:public_issue_reporter/utils/widgets.dart';
 
 import 'view_localities.dart';
 
@@ -24,14 +29,15 @@ class _AdminHomeState extends State<AdminHome> {
   void initState() {
     super.initState();
     Admin.getAdminData().then((Result result) {
-      print(result);
       if (result.success) {
         Provider.of<AdminProvider>(context, listen: false).admin = result.data;
+        SessionData.adminData = result.data;
       } else
         Navigator.of(context).push(CupertinoPageRoute(
             builder: (BuildContext context) => CompleteProfile()));
       _hideLoader();
     }).catchError((error) {
+      MyWidgets.errorDialog(context: context, message: error.toString());
       print(error);
     });
   }
@@ -41,7 +47,7 @@ class _AdminHomeState extends State<AdminHome> {
     final adminProvider = Provider.of<AdminProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Issue Reporter - Home'),
+        title: Text('Admin - Home'),
       ),
       body: Stack(
         children: <Widget>[
@@ -52,6 +58,9 @@ class _AdminHomeState extends State<AdminHome> {
       ),
     );
   }
+
+  String adminMainWork =
+      'You will have access to add localities for your area and assign authority to handle issues for that locality as well track the performance of authorities, track issues';
 
   Widget _getBody(AdminProvider adminProvider) {
     return SafeArea(
@@ -70,16 +79,41 @@ class _AdminHomeState extends State<AdminHome> {
                         style: TextStyle(
                             fontSize: 32.0, fontWeight: FontWeight.w700),
                       ),
+                      SizedBox(height: 4.0),
+                      Text(
+                          adminProvider.admin.admin_type == AdminType.Main
+                              ? adminMainWork
+                              : '',
+                          style: TextStyle(fontSize: 14.0)),
                       SizedBox(height: 16.0),
-
-                      SizedBox(height: 16.0),
-
                       (adminProvider.admin.admin_type == AdminType.Main
                           ? _forMainAdmin()
                           : _forLocalityAdmin()),
-
-                      SizedBox(height: 16.0),
-//              _forLocalityAdmin()
+                      SizedBox(height: 32.0),
+                      Align(
+                        alignment: Alignment.center,
+                        child: FlatButton(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Icon(Icons.power_settings_new),
+                              SizedBox(width: 8.0),
+                              Text(
+                                'Log out',
+                                style: TextStyle(fontSize: 18.0),
+                              ),
+                            ],
+                          ),
+                          onPressed: () {
+                            FireBase.auth.signOut().then((r) {
+                              Navigator.of(context).pushReplacement(
+                                  CupertinoPageRoute(
+                                      builder: (BuildContext context) =>
+                                          SplashScreen()));
+                            });
+                          },
+                        ),
+                      )
                     ],
                   )),
             )
@@ -105,8 +139,8 @@ class _AdminHomeState extends State<AdminHome> {
                     borderRadius: BorderRadius.circular(8.0)),
                 color: Colors.redAccent,
                 onPressed: () {
-//                  Navigator.of(context).push(CupertinoPageRoute(
-//                      builder: (BuildContext context) => ViewIssues()));
+                  Navigator.of(context).push(CupertinoPageRoute(
+                      builder: (BuildContext context) => ViewIssues()));
                 },
                 child: SizedBox(
                   height: 80.0,
@@ -211,7 +245,17 @@ class _AdminHomeState extends State<AdminHome> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0)),
                 color: Colors.redAccent,
-                onPressed: () {},
+                onPressed: () {
+                  if (SessionData.adminData.locality_id == null ||
+                      SessionData.adminData.locality_id.length < 2) {
+                    MyWidgets.errorDialog(
+                        context: context,
+                        message: 'You have not assigned to any locality');
+                  }
+                  Navigator.of(context).push(CupertinoPageRoute(
+                      builder: (BuildContext context) =>
+                          ViewIssues(status: Status.Solved)));
+                },
                 child: SizedBox(
                   height: 80.0,
                   child: Center(
@@ -231,12 +275,56 @@ class _AdminHomeState extends State<AdminHome> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0)),
                 color: Colors.blueAccent,
-                onPressed: () {},
+                onPressed: () {
+                  if (SessionData.adminData.locality_id == null ||
+                      SessionData.adminData.locality_id.length < 2) {
+                    MyWidgets.errorDialog(
+                        context: context,
+                        message: 'You have not assigned to any locality');
+                  }
+                  Navigator.of(context).push(CupertinoPageRoute(
+                      builder: (BuildContext context) =>
+                          ViewIssues(status: Status.Pending)));
+                },
                 child: SizedBox(
                   height: 80.0,
                   child: Center(
                     child: Text(
                       'View pending issues',
+                      style: TextStyle(fontSize: 20.0, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 8.0),
+        Row(
+          children: <Widget>[
+            Expanded(
+              flex: 5,
+              child: RaisedButton(
+                elevation: 4.0,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0)),
+                color: Colors.redAccent,
+                onPressed: () {
+                  if (SessionData.adminData.locality_id == null ||
+                      SessionData.adminData.locality_id.length < 2) {
+                    MyWidgets.errorDialog(
+                        context: context,
+                        message: 'You have not assigned to any locality');
+                  }
+                  Navigator.of(context).push(CupertinoPageRoute(
+                      builder: (BuildContext context) =>
+                          ViewIssues(status: Status.Rejected)));
+                },
+                child: SizedBox(
+                  height: 80.0,
+                  child: Center(
+                    child: Text(
+                      'View rejected issues',
                       style: TextStyle(fontSize: 20.0, color: Colors.white),
                     ),
                   ),

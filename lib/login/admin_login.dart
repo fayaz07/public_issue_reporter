@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:public_issue_reporter/backend/initialize.dart';
+import 'package:public_issue_reporter/firebase/initialize.dart';
 import 'package:public_issue_reporter/login/who_are_you.dart';
 import 'package:public_issue_reporter/screens/admin/admin_home.dart';
 import 'package:public_issue_reporter/utils/configs.dart';
@@ -34,6 +34,7 @@ class _AdminLoginState extends State<AdminLogin> {
         onWillPop: () {
           Navigator.of(context).pushReplacement(CupertinoPageRoute(
               builder: (BuildContext context) => WhoAreYou()));
+          return Future.value(true);
         },
         child: SafeArea(
           child: Stack(
@@ -48,14 +49,15 @@ class _AdminLoginState extends State<AdminLogin> {
     );
   }
 
-  login() {
+  login() async {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       _showLoader();
 
-      FireBase.auth
-          .signInWithEmailAndPassword(email: email, password: password)
-          .then((AuthResult result) async {
+      try {
+        AuthResult result = await FireBase.auth
+            .signInWithEmailAndPassword(email: email, password: password);
+
         if (result.user != null) {
 //          print("login success");
           FireBase.currentUser = await FirebaseAuth.instance.currentUser();
@@ -64,10 +66,9 @@ class _AdminLoginState extends State<AdminLogin> {
         } else {
           print('failed');
         }
-      }).catchError((error) {
-        print(error);
-      });
-
+      } catch (error) {
+        MyWidgets.errorDialog(context: context, message: error.toString());
+      }
       _hideLoader();
     }
   }

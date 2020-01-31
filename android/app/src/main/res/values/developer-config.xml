@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--string name="mapbox_access_token">pk.eyJ1IjoibnVyYm90IiwiYSI6ImNpaG0ycXA3czBvamh2NWtsZzBzdHE2dmQifQ.B7NiVcQD0DFguQF1aRcOeQ</string-->
+    <string name="mapbox_access_token">pk.eyJ1IjoicmF2aS1uIiwiYSI6ImNrNWUzNGJiajIzNWgzZ28zYTQ0aWgxdmYifQ.BQSBiAW8R5a9qYFUs-HRIg</string>
+
+    <string name="user_location_permission_explanation">This app needs location permissions to show its functionality.</string>
+    <string name="user_location_permission_not_granted">You didn\'t grant location permissions.</string>
+</resources>

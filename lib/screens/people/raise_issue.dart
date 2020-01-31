@@ -6,7 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
-import 'package:public_issue_reporter/backend/initialize.dart';
+import 'package:public_issue_reporter/firebase/initialize.dart';
 import 'package:public_issue_reporter/data_models/issue.dart';
 import 'package:public_issue_reporter/data_models/result.dart';
 import 'package:public_issue_reporter/providers/people/people_data_provider.dart';

@@ -54,7 +54,7 @@ class _PeopleHomeState extends State<PeopleHome> {
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: [
                       buildHomeScreen(peopleDataProvider, statisticsProvider),
-                      getNotificationScreen(),
+                     // getNotificationScreen(),
                       getProfile(),
                     ].elementAt(_currentScreenIndex),
                   )
@@ -294,10 +294,10 @@ class _PeopleHomeState extends State<PeopleHome> {
             icon: Icon(Icons.home),
             title: Text('Home'),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            title: Text('Notifications'),
-          ),
+//          BottomNavigationBarItem(
+//            icon: Icon(Icons.notifications),
+//            title: Text('Notifications'),
+//          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             title: Text('Profile'),

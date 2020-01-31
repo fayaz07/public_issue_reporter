@@ -1,8 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:public_issue_reporter/data_models/people.dart';
 import 'package:public_issue_reporter/data_models/result.dart';
+import 'package:public_issue_reporter/firebase/initialize.dart';
+import 'package:public_issue_reporter/login/splash.dart';
 import 'package:public_issue_reporter/providers/people/people_data_provider.dart';
+import 'package:public_issue_reporter/utils/widgets.dart';
 
 class UserProfileScreen extends StatefulWidget {
   @override
@@ -68,7 +72,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             padding: const EdgeInsets.all(30.0),
             child: RaisedButton(
               color: Colors.white,
-              onPressed: () {},
+              onPressed: () {
+                FireBase.auth.signOut().then((v) {
+                  Navigator.of(context).pushReplacement(CupertinoPageRoute(
+                      builder: (BuildContext context) => SplashScreen()));
+                }).catchError((error) {
+                  MyWidgets.errorDialog(
+                      context: context,
+                      message: 'Unable to log out, please try later');
+                });
+              },
               child: Text(
                 "Log Out",
                 style:

@@ -28,10 +28,20 @@ class FireBase {
     if (currentUser == null) {
       return {'logged_in': false};
     } else {
+
       /// People loggedin
-      if (currentUser.email == null) return {'logged_in': true, 'user_type': 1};
+      if (currentUser.phoneNumber != null && currentUser.phoneNumber.length>10) {
+        print('Current user - people: ${currentUser.phoneNumber}');
+        return {'logged_in': true, 'user_type': 1};
+      }
+
       /// Admin loggedin
-      return {'logged_in': true, 'user_type': 2};
+      if (currentUser.email != null && currentUser.email.length>3) {
+        print('Current user - admin: ${currentUser.email}');
+        return {'logged_in': true, 'user_type': 2};
+      }
+
+      return {'logged_in': false};
     }
   }
 
@@ -43,7 +53,8 @@ class FireBase {
     StorageTaskSnapshot snapshot = await uploadTask.onComplete;
 
     debugPrint(
-        "Uploading asset ${uuid}.png, to path ${ref.toString()}: ${snapshot.bytesTransferred / snapshot.totalByteCount}");
+        "Uploading asset ${uuid}.png, to path ${ref.toString()}:${snapshot.bytesTransferred / snapshot.totalByteCount}");
+
     if (snapshot.bytesTransferred == snapshot.totalByteCount) {
       var result = await snapshot.ref.getDownloadURL();
       return result.toString();

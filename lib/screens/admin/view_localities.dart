@@ -73,7 +73,7 @@ class _ViewLocalitiesState extends State<ViewLocalities> {
               ),
             ),
             Text(
-              'Locality Admin: ${locality.additional_data.name}',
+              'Locality Admin: ${locality.additional_data == null ? 'Not assigned' : locality.additional_data.name} ',
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 14.0,
@@ -84,6 +84,7 @@ class _ViewLocalitiesState extends State<ViewLocalities> {
             FlatButton(
               onPressed: () {
                 localitiesProvider.removeLocality(locality);
+                Locality.deleteLocality(locality.locality_id);
               },
               child: SizedBox(
                 width: double.infinity,

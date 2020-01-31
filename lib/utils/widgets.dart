@@ -123,6 +123,49 @@ class MyWidgets {
     );
   }
 
+  static void dialog({BuildContext context, Widget content}) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        child: content,
+        elevation: 8.0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+      ),
+    );
+  }
+
+  static void errorDialog({BuildContext context, String message}) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Platform.isAndroid
+          ? AlertDialog(
+              actions: [
+                FlatButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Ok'))
+              ],
+              content: Text(message),
+              title: Text('Error'),
+              elevation: 8.0,
+            )
+          : CupertinoAlertDialog(
+              actions: [
+                FlatButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Ok'))
+              ],
+              content: Text(message),
+              title: Text('Error'),
+            ),
+    );
+  }
+
   //  For Tabs Screen
   static Widget getMenuTile(
       {Color color, String text, bool isSelected, Function onPressed}) {
@@ -203,11 +246,13 @@ class MyWidgets {
       bool isObscure,
       int maxLines,
       String initialValue,
+      TextEditingController controller,
       bool enabled}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
-        initialValue: initialValue ?? '',
+        controller: controller ?? null,
+        initialValue: initialValue ?? null,
         enabled: enabled ?? true,
         validator: validator,
         toolbarOptions:
@@ -408,11 +453,36 @@ class MyWidgets {
             Text('Status: ${issue.status.toString().substring(7)}'),
             SizedBox(height: 4.0),
             Text(
+                'Assigned admin id: ${issue.assignee_id == null ? 'Not Assigned' : issue.assignee_id}'),
+            SizedBox(height: 4.0),
+            Text(
                 'Authority status: ${issue.authority_status.toString().substring(16)}'),
             SizedBox(height: 4.0),
             Text('Last updated: ${Configs.getDateTime(issue.last_updated)}'),
           ],
         ),
+      ),
+    );
+  }
+
+  static Widget titleContent(String title, String content) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text(
+            title,
+            style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 4.0),
+          Text(
+            content,
+            style: TextStyle(fontSize: 16.0),
+          ),
+          //Divider(color: Colors.grey,height: 16.0,thickness: 1.0,)
+        ],
       ),
     );
   }
